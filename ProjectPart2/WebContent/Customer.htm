@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Customer Menu</title>
+</head>
+<link rel="stylesheet" type="text/css" href="./styles/menu_design.css">
+<body>
+	<div ng-controller="CustomerController as customerCtrl">
+		<a href ng-click="setActiveCustomer(1)">Purchase a new coupon </a><br />
+		<a href ng-click="setActiveCustomer(2)">My Coupons </a><br /> 
+		<a href ng-click="setActiveCustomer(3)">My Coupons (filtered by Type)</a><br />
+		<a href ng-click="setActiveCustomer(4)">My coupons (filtered by Price)</a><br />
+		<a href ng-click="setActiveCustomer(5)">Log out</a><br />
+
+		<div ng-show="isActiveCustomer(1)">
+			<div class="container">
+				<h1>Enter coupon's title to purchase:</h1>
+				<input type="text" ng-model="purchaseTitle" placeholder="Title" /><br />
+				<input type="number" ng-model="purchaseId" placeholder="Id" /><br />
+				<button ng-click="purchaseCoupon()">Purchase</button>
+				<p>Title: {{purchaseTitle}} </p> 
+				<p>Id: {{purchaseId}} </p>
+			</div>
+		</div>
+		<div ng-show="isActiveCustomer(2)">
+			<button ng-click="getPurchasedCoupons()">Show me my coupons</button>
+			<h1>All the Customer's Coupons:</h1>
+			<div>
+				<table border="3" id="resultTable">
+					<tr>
+						<th>Id</th>
+						<th>Title</th>
+						<th>Start Date</th>
+						<th>End Date</th>
+						<th>Amount</th>
+						<th>Type</th>
+						<th>Message</th>
+						<th>Price</th>
+						<th>Image</th>
+					</tr>
+					<tr ng-repeat="coupon in coupons">
+						<td>{{coupon.id}}</td>
+						<td>{{coupon.title}}</td>
+						<td>{{coupon.startDate}}</td>
+						<td>{{coupon.endDate}}</td>
+						<td>{{coupon.amount}}</td>
+						<td>{{coupon.type}}</td>
+						<td>{{coupon.message}}</td>
+						<td>{{coupon.price}}</td>
+						<td>{{coupon.image}}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div ng-show="isActiveCustomer(3)">
+			<select ng-model="getCouponTypeCustomerFilter">
+				<option value="GENERAL">General</option>
+				<option value="FOOD">Food</option>
+				<option value="TRAVEL">Travel</option>
+				<option value="HEALTH">Health</option>
+				<option value="FURNITURE">Furniture</option>
+				<option value="HOME">Home</option>
+				<option value="GADGETS">Gadgets</option>
+			</select>
+			<button ng-click="getPurchasedCouponsByType()">Show me my coupons sorted by type</button>
+				
+			Type: {{getCouponTypeCustomerFilter}}
+			<div>
+				<table border="3" id="resultTableType">
+					<tr>
+						<th>Id</th>
+						<th>Title</th>
+						<th>Start Date</th>
+						<th>End Date</th>
+						<th>Amount</th>
+						<th>Message</th>
+						<th>Price</th>
+						<th>Image</th>
+					</tr>
+					<tr ng-repeat="coupon in typeAnswer">
+						<td>{{coupon.id}}</td>
+						<td>{{coupon.title}}</td>
+						<td>{{coupon.startDate}}</td>
+						<td>{{coupon.endDate}}</td>
+						<td>{{coupon.amount}}</td>
+						<td>{{coupon.message}}</td>
+						<td>{{coupon.price}}</td>
+						<td>{{coupon.image}}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div ng-show="isActiveCustomer(4)">
+			<p>Please Specify Coupons' Price to See:</p>
+			<input type="number" ng-model="getPriceCouponsFilter"
+				placeholder="Price" /><br />
+			<button ng-click="getPurchasedCouponsByPrice()">Show me my
+				coupons</button>
+
+			<h1>Relevant Coupons:</h1>
+			<div>
+				<table border="3" id="resultTablePrice">
+					<tr>
+						<th>Id</th>
+						<th>Title</th>
+						<th>Start Date</th>
+						<th>End Date</th>
+						<th>Amount</th>
+						<th>Type</th>
+						<th>Message</th>
+						<th>Price</th>
+						<th>Image</th>
+					</tr>
+					<tr ng-repeat="coupon in coupons">
+						<td>{{coupon.id}}</td>
+						<td>{{coupon.title}}</td>
+						<td>{{coupon.startDate}}</td>
+						<td>{{coupon.endDate}}</td>
+						<td>{{coupon.amount}}</td>
+						<td>{{coupon.type}}</td>
+						<td>{{coupon.message}}</td>
+						<td>{{coupon.price}}</td>
+						<td>{{coupon.image}}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div ng-show="isActiveCustomer(5)">
+		<h1>Are you sure, that you want to log out?</h1>
+			<button ng-click="logOutCustomer()">Log out</button>	
+		</div>
+	</div>
+</body>
+</html>

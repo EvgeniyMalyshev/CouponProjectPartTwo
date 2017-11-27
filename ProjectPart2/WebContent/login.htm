@@ -1,0 +1,26 @@
+<title>login</title>
+<link rel="stylesheet" type="text/css" href="./styles/menu_design.css">
+<div ng-controller="LoginController as loginCtrl">
+
+	<form ng-submit="loginCtrl.login()">
+		<table>
+			<tr>
+				<td>Username:</td>
+				<td><input type="text" ng-model="user.name"></input></td>
+			</tr>
+			<tr>
+				<td>Password:</td>
+				<td><input type="password" ng-model="user.password"></input></td>
+			</tr>
+			<tr>
+				<td>Type:</td>
+				<td><select ng-model="loginType" class="loginSelect">
+						<option value="admin">administrator</option>
+						<option value="companies">company</option>
+						<option value="customers">customer</option>
+				</select></td>
+			</tr>
+		</table>
+		<input type="submit" value="login" />
+	</form>
+</div>

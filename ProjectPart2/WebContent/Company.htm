@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Company Menu</title>
+</head>
+<link rel="stylesheet" type="text/css" href="./styles/menu_design.css">
+<body>
+	<div ng-controller="CompanyController as companyCtrl">
+		<a href ng-click="setActiveCompany(1)">Create a new Coupon </a><br />
+		<a href ng-click="setActiveCompany(2)">Remove a Coupon </a><br /> 
+		<a href ng-click="setActiveCompany(3)">Update a Coupon </a><br /> 
+		<a href ng-click="setActiveCompany(4)">View a certain coupon </a><br />
+		<a href ng-click="setActiveCompany(5)"> My Coupons </a><br /> 
+		<a href ng-click="setActiveCompany(6)"> My Coupons (filtered by type)</a><br />
+		<a href ng-click="setActiveCompany(7)">Log out</a><br />
+	
+	<div ng-show="isActiveCompany(1)">
+	 <div class="container">
+			<h1>Please Enter Details for New Coupon:</h1>
+			<input type="text" ng-model="createTitle" placeholder="Title" /><br />
+			<input type="text" ng-model="createMessage" placeholder="Message" /><br />
+			<input type="number" ng-model="createPrice" placeholder="Price" /><br />
+			<input type="text" ng-model="createImage" placeholder="Image" /><br />
+			<input type="number" min="1" max="10" ng-model="createAmount" placeholder="Amount (at least 1)"> <br />
+			<input type="date" ng-model="createStartDate" name="nameStartDate" placeholder="Strat Date"> <br /> 
+			<input type="date" ng-model="createEndDate" name="nameEndDate" placeholder="End Date"> <br />
+			<select id="couponType" ng-model="createType">
+				<option value="GENERAL">General</option>
+				<option value="FOOD">Food</option>
+				<option value="TRAVEL">Travel</option>
+				<option value="HEALTH">Health</option>
+				<option value="FURNITURE">Furniture</option>
+				<option value="HOME">Home</option>
+				<option value="GADGETS">Gadgets</option>
+			</select>
+			<button ng-click="createCoupon()">Create</button>
+			<p>
+				Title: {{createTitle}} <br /> Message: {{createMessage}} <br />
+				Price: {{createPrice}} <br />Image: {{createImage}} <br /> Amount:
+				{{createAmount}} <br /> Type: {{createType}} <br /> Start Date:
+				{{createStartDate | date : 'shortDate'}} <br /> End Date:
+				{{createEndDate | date : 'shortDate'}}
+			</p>
+		</div>
+	</div>
+	<div ng-show="isActiveCompany(2)">
+		<div class="container">
+			<h1>Please Enter Id to Remove Coupon</h1>
+			<input type="text" ng-model="idRemove" placeholder="Id" /> <br />
+			<button ng-click="removeCoupon()">Remove</button>
+		</div>
+	</div>
+	<div ng-show="isActiveCompany(3)">
+		<div class="container">
+			<h1>Please Enter Details to Update Coupon</h1>
+			<input type="number" ng-model="idUpdate" placeholder="Id" /> <br />
+			<input type="text" ng-model="updateTitle" placeholder="Title" /><br />
+			<input type="date" ng-model="updateStartDate" name="nameStartDate" placeholder="Start Date"> <br />
+		    <input type="date" ng-model="updateEndDate" name="nameEndDate" placeholder="End Date"> <br />
+			<input type="number" min="1" max="10" ng-model="updateAmount" placeholder="Amount"> <br /> 
+			<input type="text" ng-model="updateMessage" placeholder="Message" /><br />
+			<input type="number" ng-model="updatePrice" placeholder="Price" /><br />
+			<button ng-click="updateCoupon()">Update</button> 
+			<p>
+				id: {{idUpdate}} <br /> title: {{updateTitle}} <br /> Price:
+				{{updatePrice}} <br />message: {{updateMessage}} <br /> Amount:
+				{{updateAmount}} <br /> End Date: {{updateEndDate | date :
+				'shortDate'}}
+			</p>
+		</div>
+	</div>
+	<div ng-show="isActiveCompany(4)">
+		<div class="container">
+			<input type="text" ng-model="getIdCoupon" placeholder="Id">
+			<button ng-click="getCoupon()">Get</button>
+			<h1>Requested Coupon's Id is: {{getIdCoupon}}</h1>
+			<p>
+				<b>id: {{answerCoupon.id}}</b>
+			</p>
+			<p>
+				<b>Title: {{answerCoupon.title}}</b>
+			</p>
+			<p>
+				<b>Message: {{answerCoupon.message}}</b>
+			</p>
+			<p>
+				<b>Price: {{answerCoupon.price}}</b>
+			</p>
+			<p>
+				<b>Image: {{answerCoupon.image}}</b>
+			</p>
+			<p>
+				<b>Amount: {{answerCoupon.amount}}</b>
+			</p>
+			<p>
+				<b>Start Date: {{answerCoupon.startDate}}</b>
+			</p>
+			<p>
+				<b>End Date: {{answerCoupon.endDate}}</b>
+			</p>
+			<p>
+				<b>Type: {{answerCoupon.type}}</b>
+			</p>
+		</div>
+	</div>
+	<div ng-show="isActiveCompany(5)">
+		<button ng-click="getAllCoupons()">Show All Coupons</button>
+		<h1>All the Companies' Coupons:</h1>
+		<div>
+			<table border="3" id=resultTable>
+				<tr>
+					<th>Id</th>
+					<th>Title</th>
+					<th>Start Date</th>
+					<th>End Date</th>
+					<th>Amount</th>
+					<th>Type</th>
+					<th>Message</th>
+					<th>Price</th>
+					<th>Image</th>
+				</tr>
+				<tr ng-repeat="coupon in coupons">
+					<td>{{coupon.id}}</td>
+					<td>{{coupon.title}}</td>
+					<td>{{coupon.startDate}}</td>
+					<td>{{coupon.endDate}}</td>
+					<td>{{coupon.amount}}</td>
+					<td>{{coupon.type}}</td>
+					<td>{{coupon.message}}</td>
+					<td>{{coupon.price}}</td>
+					<td>{{coupon.image}}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div ng-show="isActiveCompany(6)">
+		<select id="typeCouponType" ng-model="getCouponType">
+			<option value="GENERAL">General</option>
+			<option value="FOOD">Food</option>
+			<option value="TRAVEL">Travel</option>
+			<option value="HEALTH">Health</option>
+			<option value="FURNITURE">Furniture</option>
+			<option value="HOME">Home</option>
+			<option value="GADGETS">Gadgets</option>
+		</select>
+		<button ng-click="getCouponsByType()">Get</button>
+		Type: {{getCouponType}}
+		<div>
+			<table border="3" id=resultTableType>
+				<tr>
+					<th>Id</th>
+					<th>Title</th>
+					<th>Start Date</th>
+					<th>End Date</th>
+					<th>Amount</th>
+					<th>Message</th>
+					<th>Price</th>
+					<th>Image</th>
+				</tr>
+				<tr ng-repeat="coupon in typeAnswer">
+					<td>{{coupon.id}}</td>
+					<td>{{coupon.title}}</td>
+					<td>{{coupon.startDate}}</td>
+					<td>{{coupon.endDate}}</td>
+					<td>{{coupon.amount}}</td>
+					<td>{{coupon.message}}</td>
+					<td>{{coupon.price}}</td>
+					<td>{{coupon.image}}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div ng-show="isActiveCompany(7)">
+	<h1>Are you shure, that you whant to log out?</h1>
+			<button ng-click="logOut()">Log out</button>	
+	</div>
+	</div>
+</body>
+</html>

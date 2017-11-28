@@ -167,7 +167,7 @@
 	
 	app.controller('CompanyController', function($scope, $http, $location) {
 		var activeMethodComp = 0;
-		var companyBaseUrl = 'rest/companies/coupons';
+		var companyBaseUrl = 'rest/companies/';
 		$scope.isActiveCompany = function(currentMethod) {
 			return $scope.activeMethodComp === currentMethod;
 		};
@@ -189,7 +189,7 @@
 			var e = document.getElementById("couponType");
 			createdCoupon.type = e.options[e.selectedIndex].value;
 			var jsonObj = JSON.stringify(createdCoupon);
-			$http.post(companyBaseUrl, jsonObj).then(function(response) {
+			$http.post(companyBaseUrl + "coupons", jsonObj).then(function(response) {
 				$scope.tempCompany = angular.fromJson(response.data);
 				alert("Coupon was created");
 			}, function(response) {
@@ -200,7 +200,7 @@
 		$scope.removeCoupon = function() {
 			$http({
 				method : 'DELETE',
-				url : companyBaseUrl + "/" + $scope.idRemove
+				url : companyBaseUrl + "coupons/" + $scope.idRemove
 			}).then(function(response) {
 				$scope.answer = response.data;
 				alert('Coupon removed!');
@@ -222,10 +222,10 @@
 			updatedCoupon.endDate = endUpdate;
 			var jsonObjUpdate = JSON.stringify(updatedCoupon);
 			alert('Coupon updated!');
-			$http.put(companyBaseUrl, jsonObjUpdate);
+			$http.put(companyBaseUrl + "coupons", jsonObjUpdate);
 		};
 		$scope.getCoupon = function() {
-			url = companyBaseUrl + "/" + $scope.getIdCoupon;
+			url = companyBaseUrl + "coupons/" + $scope.getIdCoupon;
 			$http.get(url).then(function(response) {
 				$scope.answerCoupon = response.data;
 			}, function(response) {
@@ -233,7 +233,7 @@
 			});
 		};
 		$scope.getAllCoupons = function() {
-			$http.get(companyBaseUrl).then(function(response) {
+			$http.get(companyBaseUrl + $scope.getId + "/coupons").then(function(response) {
 				$scope.coupons = response.data;
 			}, function(response) {
 				alert("Coupons was not founded!");
@@ -242,7 +242,7 @@
 		$scope.getCouponsByType = function() {
 			var e = document.getElementById("typeCouponType");
 			var requestedType = e.options[e.selectedIndex].value;
-			url = companyBaseUrl + "/type/" + requestedType;
+			url = companyBaseUrl + "coupons/type/" + requestedType;
 			$http.get(url).then(function(response) {
 				$scope.typeAnswer = response.data;
 			}, function(response) {
@@ -250,7 +250,7 @@
 			});
 		};
 		$scope.logoutCompany = function() {
-			url = companyBaseUrl + "/logoutcompany";
+			url = companyBaseUrl + "coupons/logoutcompany";
 			$http.post(url).then(function(response) {
 				alert("Successfully logged out from the System");
 				$location.path("/"); 
@@ -260,7 +260,7 @@
 	});
 	
 	app.controller('CustomerController', function($scope, $http, $location) {
-		var customerBaseUrl = "rest/customers/coupons";
+		var customerBaseUrl = "rest/customers/";
 		$scope.isActiveCustomer = function(currentMethod) {
 			return $scope.activeMethod === currentMethod;
 		};
@@ -272,7 +272,7 @@
 			couponPurchase.title = $scope.purchaseTitle;
 			couponPurchase.id = $scope.purchaseId;
 			var jsonObj = JSON.stringify(couponPurchase);
-			$http.post(customerBaseUrl, jsonObj).then(function(response) {
+			$http.post(customerBaseUrl + "coupons", jsonObj).then(function(response) {
 				$scope.temp = angular.fromJson(response.data);
 				alert("Coupon was purchased!");
 			}, function(response) {
@@ -280,7 +280,7 @@
 			});
 		};
 		$scope.getPurchasedCoupons = function() {
-			$http.post(customerBaseUrl).then(function(response) {
+			$http.post(customerBaseUrl + "coupons").then(function(response) {
 				$scope.puchasedCoupons = response.data;
 			}, function(response) {
 				alert("Coupons was not founded!");
@@ -288,7 +288,7 @@
 		};
 		$scope.getPurchasedCouponsByType = function() {
 			var customerType = $scope.getCouponTypeCustomerFilter;
-			url = customerBaseUrl + "/" + customerType;
+			url = customerBaseUrl + "coupons/" + customerType;
 			$http.post(url).then(function(response) {
 				$scope.puchasedCouponsType = response.data;
 			}, function(response) {
@@ -297,7 +297,7 @@
 		};
 		$scope.getPurchasedCouponsByPrice = function() {
 			var filter = $scope.getPriceCouponsFilter;
-			url = customerBaseUrl + "/price/" + filter;
+			url = customerBaseUrl + "coupons/price/" + filter;
 			$http.post(url).then(function(response) {
 				$scope.puchasedCouponsPrice = response.data;
 			}, function(response) {
@@ -305,7 +305,7 @@
 			});
 		};
 		$scope.logoutCustomer = function() {
-			url = customerBaseUrl + "/logoutcustomer";
+			url = customerBaseUrl + "coupons/logoutcustomer";
 			$http.post(url).then(function(response) {
 				alert("Successfully logged out from the System");
 				$location.path("/"); 

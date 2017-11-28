@@ -90,7 +90,7 @@ public class AdminService {
 	@GET
 	@Path("/companies/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getCompany(@PathParam("id") long id) throws Exception {
+	public Response getCompany(@PathParam("id") long id) throws FacadeExeptions {
 		Company company = AdminFacade.getCompany(id);
 		if (company == null)
 			return Response.status(Status.NOT_FOUND)

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 
 
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -46,10 +47,9 @@ public class CompanyService {
 	@POST
 	@Path("/coupons")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response createCoupon(Long companyId,Coupon coupon) {
+	public Response createCoupon(Coupon coupon) {
 		try {
-			System.out.println("creating a coupon");
-			CompanyFacade.createCoupon(coupon, companyId);
+			CompanyFacade.createCoupon(coupon);
 			return Response
 					.status(Status.OK)
 					.type(MediaType.APPLICATION_JSON)
@@ -98,7 +98,6 @@ public class CompanyService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getCoupon(@PathParam("id") long id) throws FacadeExeptions {
 		try {
-			System.out.println("geting a coupon");
 			Coupon coupon = CompanyFacade.getCoupon(id);
 			if (coupon == null)
 				throw new SQLException();			
@@ -114,25 +113,21 @@ public class CompanyService {
 	}
 //what we must have here?
 	@GET
-	@Path("/coupons")
+	@Path("/{id}/coupons")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllCoupons(long companyId)   {
-		Collection<Coupon> list = new ArrayList<>();
-		try {
-			System.out.println("get  all coupons");
-			list = CompanyFacade.getAllCoupons(companyId);
+	public Response getAllCoupons(@PathParam("id") long id) throws FacadeExeptions   {
+		Collection<Coupon> list = CompanyFacade.getAllCoupons(id);
 			return Response
 					.status(Status.OK)
 					.entity(list)
 					.type(MediaType.APPLICATION_JSON)
 					.build();
-		} catch (FacadeExeptions e) {
-			throw new CouponSystemWebException(e.getMessage(),Status.INTERNAL_SERVER_ERROR);
 		}
 
 
-	}
 
+	
+	//what we must have here?
 	@GET
 	@Path("/coupons/type/{type}")
 	@Consumes(MediaType.APPLICATION_JSON)

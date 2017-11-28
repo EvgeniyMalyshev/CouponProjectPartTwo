@@ -29,9 +29,9 @@ import javax.ws.rs.core.Response.Status;
 
 import enums.CouponType;
 import exeptions.FacadeExeptions;
-
+import facade.AdminFacade;
 import facade.CompanyFacade;
-
+import javabeans.Company;
 import javabeans.Coupon;
 
 
@@ -41,17 +41,19 @@ import javabeans.Coupon;
 @Path("/companies")
 public class CompanyService {
 
-
+	private static final String FACADE_ATTRIBE_NAME = "company";
 
 	@POST
 	@Path("/coupons")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createCoupon(Long companyId,Coupon coupon) {
 		try {
+			System.out.println("creating a coupon");
 			CompanyFacade.createCoupon(coupon, companyId);
 			return Response
 					.status(Status.OK)
 					.type(MediaType.APPLICATION_JSON)
+					.entity(coupon)
 					.build();
 		} catch (Exception e) {
 			throw new CouponSystemWebException("CompanyService: " + e.getMessage(), Status.INTERNAL_SERVER_ERROR);
@@ -59,13 +61,16 @@ public class CompanyService {
 	}
 
 	@DELETE
-	@Path("/coupons")
+	@Path("/coupons/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response removeCoupon(Long couponId,Coupon coupon) throws SQLException {
+	public Response removeCoupon(@PathParam("id") long couponId) throws SQLException {
 		try {
+			System.out.println("deleting a coupon");
+			Coupon coupon = CompanyFacade.getCoupon(couponId);
 			CompanyFacade.removeCoupon(coupon);
 			return Response.status(Status.OK)
 					.type(MediaType.APPLICATION_JSON)
+					.entity(coupon)
 					.build();
 		} catch (Exception e) {
 			throw new CouponSystemWebException(e.getMessage(), Status.BAD_REQUEST);
@@ -81,6 +86,7 @@ public class CompanyService {
 			return Response
 					.status(Status.OK)
 					.type(MediaType.APPLICATION_JSON)
+					.entity(coupon)
 					.build();
 		} catch (Exception e) {
 			throw new CouponSystemWebException(e.getMessage(), Status.NOT_MODIFIED);
@@ -92,23 +98,28 @@ public class CompanyService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getCoupon(@PathParam("id") long id) throws FacadeExeptions {
 		try {
+			System.out.println("geting a coupon");
 			Coupon coupon = CompanyFacade.getCoupon(id);
-			if (coupon.getTitle() == null)
+			if (coupon == null)
 				throw new SQLException();			
-			return Response.status(Status.OK).entity(coupon).build();
+			return Response.status(Status.OK)
+					.type(MediaType.APPLICATION_JSON)
+					.entity(coupon)
+					.build();
 		} catch (SQLException e) {
 			throw new CouponSystemWebException(e.getMessage(), Status.INTERNAL_SERVER_ERROR);
 		} 
 
 
 	}
-
-	@POST
+//what we must have here?
+	@GET
 	@Path("/coupons")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllCoupons(long companyId)   {
 		Collection<Coupon> list = new ArrayList<>();
 		try {
+			System.out.println("get  all coupons");
 			list = CompanyFacade.getAllCoupons(companyId);
 			return Response
 					.status(Status.OK)
@@ -122,19 +133,20 @@ public class CompanyService {
 
 	}
 
-	@POST
+	@GET
 	@Path("/coupons/type/{type}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response getCouponByType(long companyId,@PathParam("type") String couponType)  {
+	public Response getCouponsByType(long companyId,@PathParam("type") String couponType)  {
 		Collection<Coupon> couponsByType = new ArrayList<>();
 		try {
+			System.out.println("get all coupons by type");
 			CouponType myType = CouponType.valueOf(couponType);
 			couponsByType = CompanyFacade.getCouponByType(companyId,myType);
 			if (couponsByType.size() == 0)
 				return Response
 						.status(Status.INTERNAL_SERVER_ERROR)
-						.entity(couponsByType)
 						.type(MediaType.APPLICATION_JSON)
+						.entity(couponsByType)
 						.build();
 			return Response
 					.status(Status.OK)
@@ -152,7 +164,6 @@ public class CompanyService {
 		CompanyFacade facade = new CompanyFacade();
 		try {
 			facade = (CompanyFacade) facade.login(company.getName(), company.getPassword());
-
 			return Response
 					.status(Status.OK)
 					.build();
@@ -163,13 +174,16 @@ public class CompanyService {
 
 
 	@POST
-	@Path("/logoutcompany")
+	@Path("/coupons/logoutcompany")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response logOut(@Context HttpServletRequest req, @Context HttpServletResponse res) throws CouponSystemWebException {
+	public Response logoutCompany(@Context HttpServletRequest req, @Context HttpServletResponse res) throws CouponSystemWebException {
 		HttpSession session = (HttpSession) req.getSession(false);
 		try {
-			session.removeAttribute("facade");
-			session.invalidate();
+			if(session.getAttribute(FACADE_ATTRIBE_NAME) != null){
+				session.removeAttribute(FACADE_ATTRIBE_NAME);
+				session.invalidate();	
+				
+			}
 			return Response
 					.status(Status.OK)
 					.build();

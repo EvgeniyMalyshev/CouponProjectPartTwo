@@ -44,7 +44,7 @@
 				}
 			} ]);
 
-	app.controller('AdminController', function($scope, $http) {
+	app.controller('AdminController', function($scope, $http, $location) {
 		var activeMethod = 0;
 		var baseUrl = "rest/admin/";
 		$scope.isActive = function(currentMethod) {
@@ -159,18 +159,20 @@
 			url = baseUrl + "logout";
 			$http.post(url).then(function(response) {
 				alert("Successfully logged out from the System");
-				$http.get('login.htm');
-				$window.location.assign('/');
+				$location.path("/"); 
 			});
 		};
+		
 	});
-	app.controller('CompanyController', function($scope, $http) {
+	
+	app.controller('CompanyController', function($scope, $http, $location) {
+		var activeMethodComp = 0;
 		var companyBaseUrl = 'rest/companies/coupons';
 		$scope.isActiveCompany = function(currentMethod) {
-			return $scope.activeMethod === currentMethod;
+			return $scope.activeMethodComp === currentMethod;
 		};
 		$scope.setActiveCompany = function(method) {
-			$scope.activeMethod = method;
+			$scope.activeMethodComp = method;
 		};
 
 		$scope.createCoupon = function() {
@@ -180,37 +182,33 @@
 			createdCoupon.price = $scope.createPrice;
 			createdCoupon.image = $scope.createImage;
 			createdCoupon.amount = $scope.createAmount;
-
 			var start = new Date($scope.createStartDate).getTime();
 			var end = new Date($scope.createEndDate).getTime();
 			createdCoupon.startDate = start;
 			createdCoupon.endDate = end;
-
 			var e = document.getElementById("couponType");
 			createdCoupon.type = e.options[e.selectedIndex].value;
 			var jsonObj = JSON.stringify(createdCoupon);
 			$http.post(companyBaseUrl, jsonObj).then(function(response) {
+				$scope.tempCompany = angular.fromJson(response.data);
 				alert("Coupon was created");
 			}, function(response) {
 				alert("Coupon was not created!");
 			});
 		};
+		
 		$scope.removeCoupon = function() {
 			$http({
 				method : 'DELETE',
-				url : companyBaseUrl,
-				data : {
-					id : $scope.idRemove
-				},
-				headers : {
-					'Content-type' : 'application/json;charset=utf-8'
-				}
+				url : companyBaseUrl + "/" + $scope.idRemove
 			}).then(function(response) {
 				$scope.answer = response.data;
+				alert('Coupon removed!');
 			}, function(response) {
 				alert("Coupon was not removed!");
 			});
 		};
+		
 		$scope.updateCoupon = function() {
 			var updatedCoupon = new Object();
 			updatedCoupon.id = $scope.idUpdate;
@@ -235,7 +233,7 @@
 			});
 		};
 		$scope.getAllCoupons = function() {
-			$http.post(companyBaseUrl).then(function(response) {
+			$http.get(companyBaseUrl).then(function(response) {
 				$scope.coupons = response.data;
 			}, function(response) {
 				alert("Coupons was not founded!");
@@ -245,20 +243,23 @@
 			var e = document.getElementById("typeCouponType");
 			var requestedType = e.options[e.selectedIndex].value;
 			url = companyBaseUrl + "/type/" + requestedType;
-			$http.post(url).then(function(response) {
+			$http.get(url).then(function(response) {
 				$scope.typeAnswer = response.data;
 			}, function(response) {
 				alert("Coupon was not found!");
 			});
 		};
-		$scope.logOut = function() {
+		$scope.logoutCompany = function() {
 			url = companyBaseUrl + "/logoutcompany";
 			$http.post(url).then(function(response) {
-				alert("Successfully logged out from the System")
+				alert("Successfully logged out from the System");
+				$location.path("/"); 
+				
 			});
 		};
 	});
-	app.controller('CustomerController', function($scope, $http) {
+	
+	app.controller('CustomerController', function($scope, $http, $location) {
 		var customerBaseUrl = "rest/customers/coupons";
 		$scope.isActiveCustomer = function(currentMethod) {
 			return $scope.activeMethod === currentMethod;
@@ -272,6 +273,7 @@
 			couponPurchase.id = $scope.purchaseId;
 			var jsonObj = JSON.stringify(couponPurchase);
 			$http.post(customerBaseUrl, jsonObj).then(function(response) {
+				$scope.temp = angular.fromJson(response.data);
 				alert("Coupon was purchased!");
 			}, function(response) {
 				alert("Coupon wasn't purchased!");
@@ -279,7 +281,7 @@
 		};
 		$scope.getPurchasedCoupons = function() {
 			$http.post(customerBaseUrl).then(function(response) {
-				$scope.coupons = response.data;
+				$scope.puchasedCoupons = response.data;
 			}, function(response) {
 				alert("Coupons was not founded!");
 			});
@@ -288,7 +290,7 @@
 			var customerType = $scope.getCouponTypeCustomerFilter;
 			url = customerBaseUrl + "/" + customerType;
 			$http.post(url).then(function(response) {
-				$scope.typeAnswer = response.data;
+				$scope.puchasedCouponsType = response.data;
 			}, function(response) {
 				alert("Coupons was not founded!");
 			});
@@ -297,15 +299,16 @@
 			var filter = $scope.getPriceCouponsFilter;
 			url = customerBaseUrl + "/price/" + filter;
 			$http.post(url).then(function(response) {
-				$scope.coupons = response.data;
+				$scope.puchasedCouponsPrice = response.data;
 			}, function(response) {
 				alert("Coupons was not founded!");
 			});
 		};
-		$scope.logoutcustomer = function() {
+		$scope.logoutCustomer = function() {
 			url = customerBaseUrl + "/logoutcustomer";
 			$http.post(url).then(function(response) {
-				alert("Successfully logged out from the System")
+				alert("Successfully logged out from the System");
+				$location.path("/"); 
 			});
 		};
 	});

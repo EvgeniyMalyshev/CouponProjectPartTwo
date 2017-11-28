@@ -36,7 +36,7 @@ import javabeans.Coupon;
 @Path("/customers")
 public class CustomerService {
 
-
+	private static final String FACADE_ATTRIBE_NAME = "customer";
 
 	@POST
 	@Path("/coupons")
@@ -122,14 +122,15 @@ public class CustomerService {
 	}
 	
 	@POST
-	@Path("/logoutcustomer")
+	@Path("/coupons/logoutcustomer")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response logOutCustomer(@Context HttpServletRequest req, @Context HttpServletResponse res) throws CouponSystemWebException {
+	public Response logoutCustomer(@Context HttpServletRequest req, @Context HttpServletResponse res) throws CouponSystemWebException {
 		HttpSession session = (HttpSession) req.getSession(false);
 		try {
-			session.removeAttribute("facade");
-			session.invalidate();
-			//redirect!!!
+			if(session.getAttribute(FACADE_ATTRIBE_NAME) != null){
+				session.removeAttribute(FACADE_ATTRIBE_NAME);
+				session.invalidate();	
+			}
 			return Response
 					.status(Status.OK)
 					.build();

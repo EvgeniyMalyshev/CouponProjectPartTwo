@@ -189,7 +189,7 @@
 			var e = document.getElementById("couponType");
 			createdCoupon.type = e.options[e.selectedIndex].value;
 			var jsonObj = JSON.stringify(createdCoupon);
-			$http.post(companyBaseUrl + "coupons", jsonObj).then(function(response) {
+			$http.post(companyBaseUrl + "coupons/create", jsonObj).then(function(response) {
 				$scope.tempCompany = angular.fromJson(response.data);
 				alert("Coupon was created");
 			}, function(response) {
@@ -200,7 +200,7 @@
 		$scope.removeCoupon = function() {
 			$http({
 				method : 'DELETE',
-				url : companyBaseUrl + "coupons/" + $scope.idRemove
+				url : companyBaseUrl + "coupons/remove/" + $scope.idRemove
 			}).then(function(response) {
 				$scope.answer = response.data;
 				alert('Coupon removed!');
@@ -222,7 +222,7 @@
 			updatedCoupon.endDate = endUpdate;
 			var jsonObjUpdate = JSON.stringify(updatedCoupon);
 			alert('Coupon updated!');
-			$http.put(companyBaseUrl + "coupons", jsonObjUpdate);
+			$http.put(companyBaseUrl + "coupons/update", jsonObjUpdate);
 		};
 		$scope.getCoupon = function() {
 			url = companyBaseUrl + "coupons/" + $scope.getIdCoupon;
@@ -233,10 +233,10 @@
 			});
 		};
 		$scope.getAllCoupons = function() {
-			$http.get(companyBaseUrl + $scope.getId + "/coupons").then(function(response) {
+			$http.get(companyBaseUrl + "coupons/getall").then(function(response) {
 				$scope.coupons = response.data;
 			}, function(response) {
-				alert("Coupons was not founded!");
+				alert("Coupons was not found!");
 			});
 		};
 		$scope.getCouponsByType = function() {
@@ -272,7 +272,7 @@
 			couponPurchase.title = $scope.purchaseTitle;
 			couponPurchase.id = $scope.purchaseId;
 			var jsonObj = JSON.stringify(couponPurchase);
-			$http.post(customerBaseUrl + "coupons", jsonObj).then(function(response) {
+			$http.post(customerBaseUrl + "coupons/purchase/", jsonObj).then(function(response) {
 				$scope.temp = angular.fromJson(response.data);
 				alert("Coupon was purchased!");
 			}, function(response) {
@@ -280,19 +280,19 @@
 			});
 		};
 		$scope.getPurchasedCoupons = function() {
-			$http.post(customerBaseUrl + "coupons").then(function(response) {
+			$http.post(customerBaseUrl + "coupons/getall/").then(function(response) {
 				$scope.puchasedCoupons = response.data;
 			}, function(response) {
-				alert("Coupons was not founded!");
+				alert("Coupons was not found!");
 			});
 		};
 		$scope.getPurchasedCouponsByType = function() {
 			var customerType = $scope.getCouponTypeCustomerFilter;
-			url = customerBaseUrl + "coupons/" + customerType;
+			url = customerBaseUrl + "coupons/getbytype/" + customerType;
 			$http.post(url).then(function(response) {
 				$scope.puchasedCouponsType = response.data;
 			}, function(response) {
-				alert("Coupons was not founded!");
+				alert("Coupons was not found!");
 			});
 		};
 		$scope.getPurchasedCouponsByPrice = function() {
@@ -301,7 +301,7 @@
 			$http.post(url).then(function(response) {
 				$scope.puchasedCouponsPrice = response.data;
 			}, function(response) {
-				alert("Coupons was not founded!");
+				alert("Coupons was not found!");
 			});
 		};
 		$scope.logoutCustomer = function() {

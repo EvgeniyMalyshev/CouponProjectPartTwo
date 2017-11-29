@@ -2,8 +2,6 @@ package service;
 
 import java.io.IOException;
 
-
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -12,13 +10,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @WebFilter("/rest/*")
 public class SessionFilter implements Filter {
 
-	private static final String FACADE_ATTRIBE_NAME = "facade";
+	private static final String FACADE_TYPE_ATTRIBE_NAME = "facade";
 
 	@Override
 	public void destroy() {
@@ -48,14 +45,14 @@ public class SessionFilter implements Filter {
 
 		String prefix = request.getContextPath() + "/rest/";
 
-		Object facade = session.getAttribute(FACADE_ATTRIBE_NAME);
+		Object facade = session.getAttribute(FACADE_TYPE_ATTRIBE_NAME);
 		if (facade == null) {
 			if (requestURI.equals(prefix + "admin/login")) {
-				session.setAttribute(FACADE_ATTRIBE_NAME, "admin");
+				session.setAttribute(FACADE_TYPE_ATTRIBE_NAME, "admin");
 			} else if (requestURI.equals(prefix + "companies/login")) {
-				session.setAttribute(FACADE_ATTRIBE_NAME, "companies");
+				session.setAttribute(FACADE_TYPE_ATTRIBE_NAME, "companies");
 			} else if (requestURI.equals(prefix + "customers/login")) {
-				session.setAttribute(FACADE_ATTRIBE_NAME, "customers");
+				session.setAttribute(FACADE_TYPE_ATTRIBE_NAME, "customers");
 			}
 		}
 		chain.doFilter(req, res);

@@ -104,8 +104,13 @@ public class AdminService {
 	@GET
 	@Path("/companies")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllCompanies() throws Exception {
-		Collection<Company> list = AdminFacade.getAllCompanies();
+	public Response getAllCompanies()  {
+		Collection<Company> list = null;
+		try {
+			list = AdminFacade.getAllCompanies();	
+		} catch (FacadeExeptions e) {
+			e.printStackTrace();
+		}
 		return Response
 				.status(Status.OK)
 				.entity(list)

@@ -1,10 +1,5 @@
 package service;
 
-
-
-
-
-
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -21,17 +16,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-
-
 import enums.CouponType;
 import facade.CustomerFacade;
 import javabeans.Coupon;
-
-
-
-
-
-
 
 @Path("/customers")
 public class CustomerService {
@@ -39,50 +26,49 @@ public class CustomerService {
 	private static final String FACADE_ATTRIBE_NAME = "customer";
 
 	@POST
-	@Path("/coupons")
+	@Path("/coupons/purchase")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response purchaseCoupon(long companyId,Coupon coupon) {
-
+	public Response purchaseCoupon(Coupon coupon, @Context HttpServletRequest req, @Context HttpServletResponse res) {
 		try {
-			CustomerFacade.purchaseCoupon(companyId,coupon);
-			return Response
-					.status(Status.OK)
-					.type(MediaType.APPLICATION_JSON)
-					.build();
+			Long customerId = getCustomerId(req);
+			if (customerId != null) {
+				CustomerFacade.purchaseCoupon(customerId, coupon);
+			}
+			return Response.status(Status.OK).type(MediaType.APPLICATION_JSON).build();
 		} catch (Exception e) {
 			throw new CouponSystemWebException(e.getMessage(), Status.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@POST
-	@Path("/coupons")
+	@Path("/coupons/getall")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllPurchasedCoupons(long companyId)  {
-		Collection<Coupon> list = new ArrayList<>();
+	public Response getAllPurchasedCoupons(@Context HttpServletRequest req, @Context HttpServletResponse res) {
+		Collection<Coupon> list = new ArrayList<Coupon>();
 		try {
-			list = CustomerFacade.getAllPurchasedCoupons(companyId);
-			return Response
-					.status(Status.OK)
-					.entity(list)
-					.build();
+			Long customerId = getCustomerId(req);
+			if (customerId != null) {
+				list = CustomerFacade.getAllPurchasedCoupons(customerId);
+			}
 		} catch (Exception e) {
 			throw new CouponSystemWebException(e.getMessage(), Status.INTERNAL_SERVER_ERROR);
 		}
-
+		return Response.status(Status.OK).entity(list).build();
 	}
 
 	@POST
-	@Path("/coupons/{type}")
+	@Path("/coupons/getbytype/{type}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllPurchasedCouponsByType(long companyId,@PathParam("type") String type)  {
-		Collection<Coupon> list = new ArrayList<>();
+	public Response getAllPurchasedCouponsByType(@PathParam("type") String type, @Context HttpServletRequest req, @Context HttpServletResponse res) {
+		Collection<Coupon> list = new ArrayList<Coupon>();
 		try {
-			CouponType c = CouponType.valueOf(type);
-			list = CustomerFacade.getAllPurchasedCouponsByType(companyId,c);
-			return Response
-					.status(Status.OK)
-					.entity(list)
-					.build();
+			
+			Long customerId = getCustomerId(req);
+			if (customerId != null) {
+				CouponType c = CouponType.valueOf(type);
+				list = CustomerFacade.getAllPurchasedCouponsByType(customerId, c);
+			}
+			return Response.status(Status.OK).entity(list).build();
 		} catch (Exception e) {
 			throw new CouponSystemWebException(e.getMessage(), Status.INTERNAL_SERVER_ERROR);
 		}
@@ -92,15 +78,14 @@ public class CustomerService {
 	@POST
 	@Path("/coupons/price/{price}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllPurchasedCouponsByPrice(long companyId,@PathParam("price") double couponPrice)  {
-		Collection<Coupon> list = new ArrayList<>();
+	public Response getAllPurchasedCouponsByPrice(@PathParam("price") double couponPrice, @Context HttpServletRequest req, @Context HttpServletResponse res) {
+		Collection<Coupon> list = new ArrayList<Coupon>();
 		try {
-			list = CustomerFacade.getAllPurchasedCouponsByPrice(companyId,couponPrice);
-
-			return Response
-					.status(Status.OK)
-					.entity(list)
-					.build();
+			Long customerId = getCustomerId(req);
+			if (customerId != null) {
+				list = CustomerFacade.getAllPurchasedCouponsByPrice(customerId, couponPrice);
+			}
+			return Response.status(Status.OK).entity(list).build();
 		} catch (Exception e) {
 			throw new CouponSystemWebException(e.getMessage(), Status.INTERNAL_SERVER_ERROR);
 		}
@@ -109,34 +94,41 @@ public class CustomerService {
 	@POST
 	@Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Response login(GenericUser customer) {
+	public Response login(GenericUser customer, @Context HttpServletRequest req, @Context HttpServletResponse res) {
 		CustomerFacade facade = new CustomerFacade();
 		try {
 			facade = (CustomerFacade) facade.login(customer.getName(), customer.getPassword());
-			return Response
-					.status(Status.OK)
-					.build();
+			req.getSession().setAttribute(FACADE_ATTRIBE_NAME, facade);
+			return Response.status(Status.OK).build();
+		} catch (Exception e) {
+			throw new CouponSystemWebException(e.getMessage(), Status.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@POST
+	@Path("/coupons/logoutcustomer")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response logoutCustomer(@Context HttpServletRequest req, @Context HttpServletResponse res)
+			throws CouponSystemWebException {
+		HttpSession session = (HttpSession) req.getSession(false);
+		try {
+			if (session.getAttribute(FACADE_ATTRIBE_NAME) != null) {
+				session.removeAttribute(FACADE_ATTRIBE_NAME);
+				session.invalidate();
+			}
+			return Response.status(Status.OK).build();
+
 		} catch (Exception e) {
 			throw new CouponSystemWebException(e.getMessage(), Status.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
-	@POST
-	@Path("/coupons/logoutcustomer")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response logoutCustomer(@Context HttpServletRequest req, @Context HttpServletResponse res) throws CouponSystemWebException {
-		HttpSession session = (HttpSession) req.getSession(false);
-		try {
-			if(session.getAttribute(FACADE_ATTRIBE_NAME) != null){
-				session.removeAttribute(FACADE_ATTRIBE_NAME);
-				session.invalidate();	
-			}
-			return Response
-					.status(Status.OK)
-					.build();
-					
-		} catch (Exception e) {
-			throw new CouponSystemWebException(e.getMessage(), Status.INTERNAL_SERVER_ERROR);
+	private static Long getCustomerId(HttpServletRequest req) {
+		Object attribute = req.getSession().getAttribute(FACADE_ATTRIBE_NAME);
+		if (attribute instanceof CustomerFacade) {
+			return ((CustomerFacade) attribute).getId();
 		}
+		return null;
 	}
+	
 }
